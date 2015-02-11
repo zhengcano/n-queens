@@ -79,12 +79,26 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
-      return false; // fixme
+      var row = this.get(rowIndex);
+      var count = 0; //Declare variable to track queen count
+      for (var i = 0; i < row.length; i++){
+        if (row[i] === 1){
+          count++;
+        }
+      }
+      return count > 1;
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      return false; // fixme
+      var rowCount = this.get('n');
+      for (var i = 0; i < rowCount; i++){
+        if(this.hasRowConflictAt(i)){
+          return true;
+        }
+      }
+
+      return false;
     },
 
 
@@ -94,12 +108,28 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      return false; // fixme
+      var size = this.get('n');
+      var count = 0; // queen count
+      // iterate over matrix
+      for (var i = 0; i < size; i++) {
+        var row = this.get(i);
+        if(row[colIndex] === 1) {
+          count++;
+        }
+      }
+      return count > 1;
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      return false; // fixme
+      //iterate over the matrix
+      var size = this.get('n');
+      for (var i = 0; i < size; i++) {
+        if (this.hasColConflictAt(i)) {
+          return true;
+        }
+      }
+      return false;
     },
 
 
@@ -109,12 +139,37 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      // base case:
+      //   row number start at majorDiagonalColumnIndex
+      //   iterate over the rows
+      //     if the row + col has a queen, record it
+      //   increment row number
+      var col = arguments[0];
+      var size = this.get('n');
+      var count = 0;
+      for (var i = 0; i < size; i++){
+        var row = this.get(i);
+        if (row[col] === 1){
+          count++;
+        }
+        col++;
+      }
+
+      return count > 1;
     },
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      return false; // fixme
+      var size = this.get('n');
+      //Iterate through each column
+      for (var i = 0; i < size; i++){
+        //call hasMajorDiagonalConflictAt for each column
+        if (this.hasMajorDiagonalConflictAt(i)){
+          //if true, return true
+          return true;
+        }
+      }
+      return false; // default return false
     },
 
 
@@ -124,12 +179,42 @@
     //
     // test if a specific minor diagonal on this board contains a conflict
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      //want to set col to a manageable variable name
+      //set count variable to 0
+      //get the size of our board
+      //
+      //iterate over the number of rows
+      //  get the row
+      //  if the row at the col has a queen
+      //    increase queen count
+      //  decrement col number
+      //return whether queen count is > 1
+      var col = minorDiagonalColumnIndexAtFirstRow;
+      var count =0;
+      var size = this.get('n');
+      for (var i = 0; i < size; i++) {
+        var row = this.get(i);
+        if (row[col] === 1) {
+          count++;
+        }
+        col--;
+      }
+      return count > 1;
     },
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      return false; // fixme
+      // get size of board
+      // iterate over the number of columns
+      //   if hasMinorDiagonalConflictAt(i)
+      //     return true
+      var size = this.get('n');
+      for (var i = 0; i < size; i++) {
+        if (this.hasMinorDiagonalConflictAt(i)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
