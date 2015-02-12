@@ -219,7 +219,7 @@
       //   if hasMinorDiagonalConflictAt(i)
       //     return true
       var size = this.get('n');
-      for (var i = 0; i < size * 2; i++) {
+      for (var i = 0; i < size * 2 - 3; i++) {
         if (this.hasMinorDiagonalConflictAt(i)) {
           return true;
         }

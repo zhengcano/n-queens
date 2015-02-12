@@ -59,54 +59,36 @@ window.findNQueensSolution = function(n) {
     solution.push([1]);
   } else if (n > 3){
     if (n === 8){
-      var col = n - 4;
-      for (var i = 0; i < n/2; i++){
-        var row = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
-        row[col] =1;
-        solution.push(row);
-        col -= 2;
-        if (col < 0){
-          col = n - 2;
+      var halfMatrix = function(column){
+        for (var i = 0; i < n/2; i++){
+          var row = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
+          row[column] =1;
+          solution.push(row);
+          column -= 2;
+          //pattern continues on right side when at the left edge
+          if (column === -2){//right position is offset by how far the queen was moved
+            column = n - 2;
+          } else if (column === -1){
+            column = n - 1;
+          }
         }
-      }
+      };
+      //pattern works for each half of board
+      //set a different starting position for each half
+      halfMatrix(n - 4);
+      halfMatrix(n - 7);
 
-      col = n - 7;
-      for (var i = 0; i < n/2; i++){
-        var row = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
-        row[col] =1;
-        solution.push(row);
-        col -= 2;
-        if (col < 0){
-          col = n - 1;
-        }
-      }
-
-    } else if (n % 2 === 0) { //if n is an even number
+    } else { //if n is an even number
       //set column to 2nd to last index
       var col = n - 2;
-
       for (var i = 0; i < n; i++){
         var row = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
         row[col] = 1; //set queen
         solution.push(row);
         col -= 2; //change column position to 2 spots to the left
-        if (col < 0){
-          col = n - 1;
-        }
-        //iteration over next row will move the position down 1 spot
-        //moving queen down like a knight will ensure that the next queen
-        //doesn't challenge the previous
-      }
-    } else { //for odd, initial position is 2 from right instead of 1
-      var col = n - 3;
-      for (var i = 0; i < n; i++){
-        var row = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
-        row[col] = 1; //set queen
-        solution.push(row);
-        col -= 2; //change column position to 2 spots to the left
-        if (col === -2){
+        if (n % 2 === 1 && col === -2){
           col = n - 2;
-        } else if (col === -1) {
+        } else if (col < 0){
           col = n - 1;
         }
         //iteration over next row will move the position down 1 spot
@@ -140,49 +122,58 @@ window.countNQueensSolutions = function(n) {
   //indices cannot be shared
   //a new queen must be at least 2 index spaces away from the previous
   var board = new Board({"n":n});
-/*
-  var findSolution = function(queensSoFar, rowNum){
-    if (queensSoFar < n){
-      for (var i = 0; i < n; i++){
-        if (!columns[i]){
-          board[rowNum][i] = 1;
-          columns[i] = true;
-          queensSoFar++;
-          findSolution(queensSoFar, rowNum+1);
-        }
-      }
-    } else {
-      if (!this.hasAnyRowConflicts)
-    }
-  };
-*/
-  var columns = [];
+  //var storage = [];
+
+  var columns = {};
   for (var i = 0; i < n; i++){
     columns[i] = false;
   }
 
+  // var diagCheck = function(row, column){
+  //   if (row < 1){
+  //     console.log(row, column);
+  //     return false;
+  //   } else {
+  //     for (var i = 0; i < row - 1; i++){
+  //       console.log(column - storage[i], row - i);
+  //       if (Math.abs(column - storage[i]) === row - i){
+  //         return true;
+  //       }
+  //     }
+  //     return false;
+  //   }
+  // };
+
   //When filling board with queens, queensSoFar = the row we're adding to
-  var findSolution = function(queensSoFar, taken){
+  var findSolution = function(queensSoFar, lastPosition){
+    lastPosition = lastPosition || n * 2;
     if (queensSoFar < n){
       for (var i = 0; i < n; i++){
-        if (taken[i] === false){
+        if (columns[i] === false && (i > lastPosition + 1 || i < lastPosition - 1) /*&& diagonal check !diagCheck(queensSoFar, i)*/){
+          //console.log(lastPosition, i > lastPosition + 1, i < lastPosition - 1);
           board.togglePiece(queensSoFar, i);
-          taken[i] = true;
-          findSolution(queensSoFar + 1, taken.slice());
+          //storage[queensSoF ar] = i;
+          columns[i] = true;
+          findSolution(queensSoFar + 1, i);
           board.togglePiece(queensSoFar, i);
-          taken[i] = false;
+          //storage[queensSoFar]
+          columns[i] = false;
         }
+          //console.log(lastPosition, i > lastPosition + 1, i < lastPosition - 1);
       }
-    } else {
-      if (!board.hasAnyRowConflicts() && !board.hasAnyColConflicts() && !board.hasAnyMajorDiagonalConflicts() && !board.hasAnyMinorDiagonalConflicts()){
+    } else /*if (storage.length === board.get('n'))*/{
+      if (!board.hasAnyMajorDiagonalConflicts() && !board.hasAnyMinorDiagonalConflicts()){
+        // console.log(board.get(0));
+        // console.log(board.get(1));
+        // console.log(board.get(2));
         solutionCount++;
       }
     }
   };
 
-  findSolution(0, columns);
+  findSolution(0);
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  //console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
 
