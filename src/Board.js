@@ -145,9 +145,14 @@
       //     if the row + col has a queen, record it
       //   increment row number
       var col = arguments[0];
+      var rowNumber = 0;
       var size = this.get('n');
+      if (col < 0) {
+        rowNumber = Math.abs(col);
+        col = 0;
+      }
       var count = 0;
-      for (var i = 0; i < size; i++){
+      for (var i = rowNumber; i < size; i++){
         var row = this.get(i);
         if (row[col] === 1){
           count++;
@@ -162,7 +167,7 @@
     hasAnyMajorDiagonalConflicts: function() {
       var size = this.get('n');
       //Iterate through each column
-      for (var i = 0; i < size; i++){
+      for (var i = (2 - size); i < size; i++){
         //call hasMajorDiagonalConflictAt for each column
         if (this.hasMajorDiagonalConflictAt(i)){
           //if true, return true
@@ -190,9 +195,14 @@
       //  decrement col number
       //return whether queen count is > 1
       var col = minorDiagonalColumnIndexAtFirstRow;
-      var count =0;
+      var rowNumber = 0;
       var size = this.get('n');
-      for (var i = 0; i < size; i++) {
+      if (col > size - 1){
+        rowNumber = col - (size - 1);
+        col = size - 1;
+      }
+      var count = 0;
+      for (var i = rowNumber; i < size; i++) {
         var row = this.get(i);
         if (row[col] === 1) {
           count++;
@@ -209,7 +219,7 @@
       //   if hasMinorDiagonalConflictAt(i)
       //     return true
       var size = this.get('n');
-      for (var i = 0; i < size; i++) {
+      for (var i = 0; i < size * 2; i++) {
         if (this.hasMinorDiagonalConflictAt(i)) {
           return true;
         }
