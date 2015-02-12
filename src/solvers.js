@@ -44,7 +44,7 @@ window.countNRooksSolutions = function(n) {
 
   for (var i = 2; i < n; i++) {
     solutionCount *= i;
-  }
+  }32
 
   //console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
@@ -122,57 +122,42 @@ window.countNQueensSolutions = function(n) {
   //indices cannot be shared
   //a new queen must be at least 2 index spaces away from the previous
   var board = new Board({"n":n});
-  //var storage = [];
+  var storage = [];
 
   var columns = {};
   for (var i = 0; i < n; i++){
     columns[i] = false;
   }
 
-  // var diagCheck = function(row, column){
-  //   if (row < 1){
-  //     console.log(row, column);
-  //     return false;
-  //   } else {
-  //     for (var i = 0; i < row - 1; i++){
-  //       console.log(column - storage[i], row - i);
-  //       if (Math.abs(column - storage[i]) === row - i){
-  //         return true;
-  //       }
-  //     }
-  //     return false;
-  //   }
-  // };
+  var diagCheck = function(row, column){
+    for (var i = 0; i < row; i++){
+      if (Math.abs(column - storage[i]) === row - i){
+        return false;
+      }
+    }
+    return true;
+  };
 
   //When filling board with queens, queensSoFar = the row we're adding to
   var findSolution = function(queensSoFar, lastPosition){
     lastPosition = lastPosition || n * 2;
     if (queensSoFar < n){
       for (var i = 0; i < n; i++){
-        if (columns[i] === false && (i > lastPosition + 1 || i < lastPosition - 1) /*&& diagonal check !diagCheck(queensSoFar, i)*/){
-          //console.log(lastPosition, i > lastPosition + 1, i < lastPosition - 1);
+        if (columns[i] === false && (i > lastPosition + 1 || i < lastPosition - 1) && diagCheck(queensSoFar, i)){
           board.togglePiece(queensSoFar, i);
-          //storage[queensSoF ar] = i;
+          storage[queensSoFar] = i;
           columns[i] = true;
           findSolution(queensSoFar + 1, i);
           board.togglePiece(queensSoFar, i);
-          //storage[queensSoFar]
+          storage[queensSoFar] = undefined;
           columns[i] = false;
         }
-          //console.log(lastPosition, i > lastPosition + 1, i < lastPosition - 1);
       }
-    } else /*if (storage.length === board.get('n'))*/{
-      if (!board.hasAnyMajorDiagonalConflicts() && !board.hasAnyMinorDiagonalConflicts()){
-        // console.log(board.get(0));
-        // console.log(board.get(1));
-        // console.log(board.get(2));
+    } else {
         solutionCount++;
-      }
     }
   };
-
   findSolution(0);
-
   //console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
