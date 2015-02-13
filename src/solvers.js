@@ -14,7 +14,7 @@
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
 window.findNRooksSolution = function(n) {
-  var solution = []; //fixme
+  var solution = []; //fixm
   var temp = [];
   for (var i = 0; i < n; i++){
     temp.push(0); //Fill temporary array with 'n' zeros
@@ -77,7 +77,6 @@ window.findNQueensSolution = function(n) {
       //set a different starting position for each half
       halfMatrix(n - 4);
       halfMatrix(n - 7);
-
     } else { //if n is an even number
       //set column to 2nd to last index
       var col = n - 2;
@@ -121,7 +120,12 @@ window.countNQueensSolutions = function(n) {
   //rows cannot be shared
   //indices cannot be shared
   //a new queen must be at least 2 index spaces away from the previous
-  var board = new Board({"n":n});
+  //var board = new Board({"n":n});
+  var board = [];
+  for (var i = 0; i < n; i++){
+    var boardRow = Array.apply(null, new Array(n)).map(Number.prototype.valueOf,0);
+    board.push(boardRow);
+  }
   var storage = [];
 
   var columns = {};
@@ -144,25 +148,76 @@ window.countNQueensSolutions = function(n) {
     if (queensSoFar < n){
       for (var i = 0; i < n; i++){
         if (columns[i] === false && (i > lastPosition + 1 || i < lastPosition - 1) && diagCheck(queensSoFar, i)){
-          board.togglePiece(queensSoFar, i);
+          //board.togglePiece(queensSoFar, i);
+          board[queensSoFar][i] = 1;
           storage[queensSoFar] = i;
           columns[i] = true;
+          //Call find solution for next row
           findSolution(queensSoFar + 1, i);
-          board.togglePiece(queensSoFar, i);
+          //Reset board positions for next iteration
+          //board.togglePiece(queensSoFar, i);
+          board[queensSoFar][i] = 0;
           storage[queensSoFar] = undefined;
           columns[i] = false;
         }
       }
     } else {
-        solutionCount++;
+      solutionCount++;
     }
   };
   findSolution(0);
+  console.log(solutionCount);
   //console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
 
+window.queensOneD = function(n) {
+  n = 15;
+  var solutionCount = 0;
+  var columns = {};
+  var board = [];
+  for (var i = 0; i < n; i++){
+    columns[i] = false;
+  }
 
+  var hasDiag = function(row, column){
+    //for each previous queen added
+    for (var i = 0; i < row; i++){
+      if(row - i === Math.abs(column - board[i])){
+        return false;
+      }
+    }
+    return true;
+  };
+
+  var findSolution = function(rows){
+    rows = rows || 0;
+    //if we're not past the last index
+    if (rows < n){
+    //iterate over the number of columns
+      for (var i = 0; i < n; i++){
+      //if the number hasn't been taken
+      //and the difference between the number and previous column
+      //values is not the same,
+        if (!columns[i] && hasDiag(rows, i)){
+        //assign the the queen to the column
+          board[rows] = i;
+          columns[i] = true;
+        //do the same for the next index
+          findSolution(rows + 1);
+          board[rows] = 0;
+          columns[i] = false;
+        }
+      }
+    } else {
+      solutionCount++;
+    }
+    //else
+      //increment the count
+  };
+  findSolution();
+  return solutionCount;
+};
 
 
 
